@@ -1,0 +1,389 @@
+/*
+ * Risk Management Dashboard - Custom Styles
+ * Theme: Dark mode with sea-green accents
+ */
+
+/* CSS Variables for consistent theming */
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --sea-green-50: #f0fdfa;
+    --sea-green-100: #ccfbf1;
+    --sea-green-200: #99f6e4;
+    --sea-green-300: #5eead4;
+    --sea-green-400: #2dd4bf;
+    --sea-green-500: #14b8a6;
+    --sea-green-600: #0d9488;
+    --sea-green-700: #0f766e;
+    --sea-green-800: #115e59;
+    --sea-green-900: #134e4a;
+    
+    /* Risk severity colors */
+    --risk-critical: #ef4444;
+    --risk-high: #f97316;
+    --risk-medium: #f59e0b;
+    --risk-low: #22c55e;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--sea-green-600);
+}
+
+/* KPI Card animations */
+.kpi-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--sea-green-500), var(--sea-green-300));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.kpi-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Glassmorphism effect for cards */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Risk Matrix Styles */
+.risk-matrix-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.risk-matrix {
+    display: grid;
+    grid-template-columns: auto repeat(5, 1fr);
+    grid-template-rows: repeat(6, auto);
+    gap: 4px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.risk-matrix-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-align: center;
+    padding: 8px 4px;
+}
+
+.risk-matrix-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+}
+
+.risk-matrix-cell {
+    aspect-ratio: 1;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.risk-matrix-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.risk-matrix-cell::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    border: 1px solid var(--border-color);
+}
+
+.risk-matrix-cell:hover::after {
+    opacity: 1;
+}
+
+/* Risk severity colors for matrix cells */
+.risk-low {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+}
+
+.risk-medium {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.risk-high {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: white;
+}
+
+.risk-critical {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-open {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.status-mitigated {
+    background: rgba(20, 184, 166, 0.2);
+    color: #14b8a6;
+    border: 1px solid rgba(20, 184, 166, 0.3);
+}
+
+.status-closed {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-accepted {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* Score badges */
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.score-critical {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.3));
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.score-high {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(234, 88, 12, 0.3));
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.5);
+}
+
+.score-medium {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.3));
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.score-low {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.3));
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.5);
+}
+
+/* Effectiveness badges */
+.effectiveness-high {
+    color: #22c55e;
+}
+
+.effectiveness-medium {
+    color: #f59e0b;
+}
+
+.effectiveness-low {
+    color: #ef4444;
+}
+
+/* Table row hover effect */
+#riskTableBody tr {
+    transition: background-color 0.2s ease;
+}
+
+#riskTableBody tr:hover {
+    background-color: rgba(20, 184, 166, 0.05);
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--sea-green-500);
+    cursor: pointer;
+}
+
+/* Loading skeleton animation */
+.skeleton {
+    background: linear-gradient(90deg, var(--card-bg) 25%, var(--border-color) 50%, var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Pulse animation for loading states */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Fade in animation */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Toast notification animation */
+.toast-visible {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+}
+
+/* Chart container responsive adjustments */
+canvas {
+    max-width: 100%;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+    .risk-matrix {
+        max-width: 300px;
+    }
+    
+    .risk-matrix-cell {
+        min-height: 40px;
+        font-size: 0.75rem;
+    }
+    
+    .kpi-card {
+        padding: 1rem;
+    }
+    
+    .kpi-card .text-3xl {
+        font-size: 1.5rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .bg-dark-card {
+        background: white;
+        border: 1px solid #ddd;
+    }
+    
+    nav, footer, #syncCsvBtn, #syncSheetsBtn {
+        display: none;
+    }
+}
+
+/* Smooth transitions for interactive elements */
+button, a, input, select {
+    transition: all 0.2s ease;
+}
+
+/* Focus states for accessibility */
+button:focus, input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--sea-green-500);
+}
+
+/* Active filter indication */
+.filter-active {
+    border-color: var(--sea-green-500) !important;
+    box-shadow: 0 0 0 1px var(--sea-green-500);
+}

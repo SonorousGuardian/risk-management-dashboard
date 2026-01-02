@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Risk Management Dashboard - Monitor and manage organizational risks"
+    />
+    <title>{% block title %}Risk Management Dashboard{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "dark-bg": "#0f172a",
+              "dark-card": "#1e293b",
+              "dark-border": "#334155",
+              "sea-green": {
+                50: "#f0fdfa",
+                100: "#ccfbf1",
+                200: "#99f6e4",
+                300: "#5eead4",
+                400: "#2dd4bf",
+                500: "#14b8a6",
+                600: "#0d9488",
+                700: "#0f766e",
+                800: "#115e59",
+                900: "#134e4a",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/static/css/styles.css" />
+
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="bg-dark-bg min-h-screen font-['Inter'] text-gray-100">
+    <!-- Sidebar Toggle Button (Fixed) -->
+    <button
+      id="sidebarToggle"
+      class="fixed top-4 left-4 z-50 p-2 bg-dark-card border border-dark-border rounded-lg hover:bg-dark-border transition-all shadow-lg"
+    >
+      <svg class="w-6 h-6 text-sea-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Sidebar Panel -->
+    <aside
+      id="sidebar"
+      class="fixed top-0 left-0 h-full w-72 bg-dark-card border-r border-dark-border z-50 transform -translate-x-full transition-transform duration-300 ease-in-out"
+    >
+      <!-- Sidebar Header -->
+      <div class="p-6 border-b border-dark-border">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-sea-green-400 to-sea-green-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-white">Risk Manager</h2>
+            <p class="text-xs text-gray-400">Actions & Reports</p>
+          </div>
+        </div>
+        <button id="closeSidebar" class="absolute top-6 right-4 text-gray-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Sidebar Content -->
+      <div class="p-4 space-y-2">
+        <!-- Data Management Section -->
+        <p class="text-xs text-gray-500 uppercase tracking-wider px-3 py-2">Data Management</p>
+        
+        <!-- Upload CSV -->
+        <button
+          id="uploadCsvBtn"
+          class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-dark-border transition-colors text-gray-300 hover:text-white"
+        >
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+          </svg>
+          <span>Upload CSV</span>
+        </button>
+
+        <!-- Sync CSV -->
+        <button
+          id="syncCsvBtn"
+          class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-dark-border transition-colors text-gray-300 hover:text-white"
+        >
+          <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>Sync from CSV</span>
+        </button>
+
+        <!-- Google Sheets -->
+        <button
+          id="syncSheetsBtn"
+          class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-dark-border transition-colors text-gray-300 hover:text-white"
+        >
+          <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span>Connect Google Sheets</span>
+        </button>
+
+        <!-- Reports Section -->
+        <p class="text-xs text-gray-500 uppercase tracking-wider px-3 py-2 mt-4">Reports</p>
+
+        <!-- Download PDF -->
+        <a
+          href="/api/reports/pdf/"
+          class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-dark-border transition-colors text-gray-300 hover:text-white"
+        >
+          <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+          <span>Download PDF Report</span>
+        </a>
+
+        <!-- Download CSV -->
+        <a
+          href="/api/reports/csv/updated/"
+          class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-dark-border transition-colors text-gray-300 hover:text-white"
+        >
+          <svg class="w-5 h-5 text-sea-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span>Download CSV Report</span>
+        </a>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-dark-border">
+        <p class="text-xs text-gray-500 text-center">Risk Management v2.0</p>
+      </div>
+    </aside>
+
+    <!-- Navigation Header (Simplified) -->
+    <nav class="bg-dark-card border-b border-dark-border sticky top-0 z-30 backdrop-blur-lg bg-opacity-90">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo and Title -->
+          <div class="flex items-center space-x-3 ml-12">
+            <div class="w-10 h-10 bg-gradient-to-br from-sea-green-400 to-sea-green-600 rounded-lg flex items-center justify-center shadow-lg shadow-sea-green-500/20">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold bg-gradient-to-r from-sea-green-300 to-sea-green-500 bg-clip-text text-transparent">
+                Risk Management
+              </h1>
+              <p class="text-xs text-gray-400">Enterprise Risk Dashboard</p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <div class="flex items-center space-x-4">
+            <a href="/" class="px-4 py-2 text-sea-green-300 hover:text-sea-green-200 transition-colors font-medium">
+              Dashboard
+            </a>
+          </div>
+
+    <!-- Google Sheets Modal -->
+    <div id="sheetsModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sheetsModalOverlay"></div>
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative bg-dark-card border border-dark-border rounded-xl shadow-2xl w-full max-w-md p-6">
+          <button id="closeSheetsModal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">Connect Google Sheets</h3>
+              <p class="text-gray-400 text-sm">Import risk data from a Google Sheet</p>
+            </div>
+          </div>
+          
+          <form id="sheetsForm">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-300 mb-2">Google Sheet URL or ID</label>
+              <input
+                type="text"
+                id="sheetUrlInput"
+                placeholder="https://docs.google.com/spreadsheets/d/... or Sheet ID"
+                class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
+              >
+              <p class="mt-2 text-xs text-gray-500">Paste the full Google Sheets URL or just the Sheet ID</p>
+            </div>
+            
+            <div class="flex space-x-3">
+              <button type="button" id="cancelSheetsSync" class="flex-1 px-4 py-2 bg-dark-border hover:bg-gray-600 rounded-lg text-gray-300 transition-colors">
+                Cancel
+              </button>
+              <button type="submit" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-white font-medium transition-colors">
+                Connect & Sync
+              </button>
+            </div>
+          </form>
+          
+          <div class="mt-4 p-4 bg-dark-bg rounded-lg">
+            <p class="text-xs text-gray-400">
+              <strong class="text-gray-300">Note:</strong> The sheet must be publicly accessible or shared with the service account.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-card border-t border-dark-border mt-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <p class="text-gray-400 text-sm">
+            © 2025 Risk Management System. All rights reserved.
+          </p>
+          <p class="text-gray-500 text-sm mt-2 md:mt-0">
+            Last updated: <span id="lastUpdateTime">-</span>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div
+      id="toast"
+      class="fixed bottom-4 right-4 transform translate-y-24 opacity-0 transition-all duration-300 z-50"
+    >
+      <div
+        class="bg-dark-card border border-dark-border rounded-lg shadow-2xl px-6 py-4 flex items-center space-x-3"
+      >
+        <div
+          id="toastIcon"
+          class="w-8 h-8 rounded-full flex items-center justify-center"
+        ></div>
+        <div>
+          <p id="toastTitle" class="font-medium"></p>
+          <p id="toastMessage" class="text-sm text-gray-400"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload CSV Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="uploadModalOverlay"></div>
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative bg-dark-card border border-dark-border rounded-xl shadow-2xl w-full max-w-md p-6">
+          <button id="closeUploadModal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          
+          <h3 class="text-xl font-semibold text-white mb-2">Upload Risk Register CSV</h3>
+          <p class="text-gray-400 text-sm mb-6">Upload a CSV file containing your risk register data.</p>
+          
+          <form id="uploadForm" enctype="multipart/form-data">
+            <div class="border-2 border-dashed border-dark-border rounded-lg p-8 text-center hover:border-sea-green-500 transition-colors" id="dropZone">
+              <input type="file" id="csvFileInput" name="file" accept=".csv" class="hidden">
+              <svg class="w-12 h-12 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <p class="text-gray-300 mb-2">Drag and drop your CSV file here</p>
+              <p class="text-gray-500 text-sm mb-4">or</p>
+              <button type="button" id="browseBtn" class="px-4 py-2 bg-sea-green-600 hover:bg-sea-green-500 rounded-lg text-white font-medium transition-colors">
+                Browse Files
+              </button>
+              <p id="selectedFileName" class="text-sea-green-400 mt-4 hidden"></p>
+            </div>
+            
+            <div class="mt-6 flex space-x-3">
+              <button type="button" id="cancelUpload" class="flex-1 px-4 py-2 bg-dark-border hover:bg-gray-600 rounded-lg text-gray-300 transition-colors">
+                Cancel
+              </button>
+              <button type="submit" id="submitUpload" class="flex-1 px-4 py-2 bg-sea-green-600 hover:bg-sea-green-500 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Upload & Process
+              </button>
+            </div>
+          </form>
+          
+          <div class="mt-4 p-4 bg-dark-bg rounded-lg">
+            <p class="text-xs text-gray-400">
+              <strong class="text-gray-300">Required columns:</strong> Risk ID, Title, Risk Owner, Risk Category, Likelihood, Impact, Status, Control Effectiveness, Last Updated
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Core Scripts -->
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/risk-matrix.js"></script>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
