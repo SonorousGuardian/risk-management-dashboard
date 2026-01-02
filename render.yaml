@@ -1,0 +1,24 @@
+databases:
+  - name: risk-management-db
+    databaseName: risk_management
+    user: risk_user
+    plan: free
+
+services:
+  - type: web
+    name: risk-management-dashboard
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn risk_management.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: risk-management-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.11.4"
