@@ -166,7 +166,3 @@ CATEGORY_CHOICES = [
     # Add new categories here
 ]
 ```
-
-## License
-
-MIT License
